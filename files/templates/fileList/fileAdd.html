@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block titulo %} Agregar documento {% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-6 col-md-4">
+            <h1>Agregar Documentos</h1>
+        </div>
+    </div>
+    <div class="row">
+        {% if request.user.is_superuser %}
+            <div class="col-12 col-md-12 mt-3">
+                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalGroup1">
+                    <i class="bi bi-pencil-square"></i>
+                    Grupos
+                </button>
+            </div>
+        {% endif %}
+    </div>
+    <form>
+        <div class="row">
+            <div class="col-12 col-md-6 mt-3">
+                <label for="groupTypeSelect">Grupo:</label>
+                <select class="form-control" id="groupTypeSelect" name="groupTypeSelect">
+                    <option value="" selected>Seleccione...</option>
+                    {% for data in objGroupSelect %}
+                        <option value="{{data.id}}">{{data.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6 mt-3">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Nombre de Documento:</label>
+                    <input type="nameTypeDocument" class="form-control form-control-sm" id="exampleInputEmail1" aria-describedby="nameTypeDocumentHelp">
+                    <div id="nameTypeDocumentHelp" class="form-text">Nombre para identificar el documento en el listado</div>
+                </div>
+                <div class="mb-3">
+                    <label for="fileInput" id="fileIpunt_label" class="form-label">Descripción de Archivo:</label>
+                    <textarea class="form-control form-control-sm" id="description_file" name="description_file" aria-describedby="nameTypeDocumentHelp"></textarea>
+                    <div id="document_fileHelp" class="form-text">Ingresa una descripción si deseas identificar mejor el contenido</div>
+                </div>
+                <div class="mb-3">
+                    <label for="fileInput" id="fileIpunt_label" class="form-label">Archivo:</label>
+                    <input class="form-control form-control-sm" type="file" id="document_file" name="document_file" aria-describedby="nameTypeDocumentHelp">
+                    <div id="document_fileHelp" class="form-text">Sube un documento, documentos permitidos: PDF Docx Doc csv csvc txt</div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Crear
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+        <!--Modal Form Edit-Add-->
+    <div class="modal fade" id="modalGroup1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalGroup1Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="pb-0 modal-header">
+                    <ul class="nav nav-tabs border-bottom-0" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Grupos</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Tipo Grupos</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Añadir/Editar</button>
+                        </li>
+                      </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <p class="fw-normal"><strong>Grupos:</strong> Un grupo deber ser creado para que dentro de el puedan estar documentos</p>
+                            <form action="/add-file-page/new-group/" method="POST">
+                                {% csrf_token %}
+                                <div class="row justify-content-center align-items-center minh-100">
+                                    <div class="col-6">
+                                        <label for="typeDocument" class="form-label">Nombre de grupo:</label>
+                                        <input class="form-control form-control-sm" type="text" id="groupName1" name="name" placeholder="Ingrese el nombre del grupo">
+                                    </div>
+                                    <div class="col-3 text-center">
+                                        <label class="form-check-label" for="flexSwitchCheckChecked">Activar:</label>
+                                        <div class="form-check form-switch mt-3 d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="activateGroup">
+                                            <input type="hidden" name="isActive" id="isActiveHidden">
+                                        </div>
+                                    </div>
+                                    <div class="col-3 mt-4 text-center">
+                                        <button class="btn btn-primary btn-sm" id="btnGroupSend" type="submit">Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr></hr>
+                            <div class="container text-center">
+                                <div class="row mb-2">
+                                    <div class="col fw-bold">
+                                        Nombre de grupo
+                                    </div>
+                                    <div class="col fw-bold">
+                                        Está activo
+                                    </div>
+                                    <div class="col fw-bold">
+                                        Acciones
+                                    </div>
+                                </div>
+                                {% for data in objGroupSelect %}
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            {{data.name}}
+                                        </div>
+                                        <div class="col">
+                                            {% if data.isActive != 0 %}
+                                                Si
+                                            {% else %}
+                                                No
+                                            {% endif %}
+                                        </div>
+                                        <div class="col">
+                                            <button class="btn btn-outline-danger btn-sm" id="btnDeleteGroup" onclick="delfun('{{data.id}}');"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            
+                        </div>
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-file-earmark-x"></i>Eliminar</button> -->
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" >
+
+        jQuery(document).ready(function(){
+
+            jQuery("#btnGroupSend").click(function(){
+                if (jQuery("#activateGroup").is(":checked")) {
+                    jQuery('#isActiveHidden').val(1);
+                }else{
+                    jQuery('#isActiveHidden').val(0);
+                }
+            });
+
+            jQuery('#modalGroup1').on('hidden.bs.modal', function () {
+            jQuery('#modalGroup1 form')[0].reset();
+            });
+        });
+    </script>
+
+{% endblock %}

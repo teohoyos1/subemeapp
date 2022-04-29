@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block titulo %} Subeme-logIn {% endblock %}
+
+{% block style %}
+    <style>
+        .login-style{
+            width: 800px;
+            margin: auto;
+
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5 login-style">
+    <h1>Perfil</h1>
+
+    <form method="POST" action="/profile/edit/" id="idProfileForm" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="usernameinput" class="form-label">Nombre de usuario:</label>
+            <input type="text" class="form-control" id="usernameinput" value="{{username}}" aria-describedby="usernameHelp" disabled>
+            <div id="usernameHelp" class="form-text">Este usuario no se puede cambiar una vez creado</div>
+        </div>
+        {{form |crispy}}
+        <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        jQuery(document).ready(function(){
+            nameInputDefault = jQuery("#id_first_name").val();
+            lastNameInputDefault = jQuery("#id_last_name").val();
+            emailInputDefault = jQuery("#id_email").val();
+
+            jQuery("#idProfileForm").submit(function(event){
+                if (jQuery("#id_first_name").val() === nameInputDefault && jQuery("#id_last_name").val() === lastNameInputDefault && jQuery("#id_email").val() === emailInputDefault){
+                    alert("No guardaste nada");
+                    event.preventDefault();
+                }
+            });
+
+        });
+    </script>
+{% endblock %}

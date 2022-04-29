@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block titulo %} Subeme-logIn {% endblock %}
+
+{% block style %}
+    <style>
+        .login-style{
+            width: 500px;
+            margin: auto;
+
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5 login-style">
+    <h1>Iniciar Sesión</h1>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {{ login_form|crispy }}
+        <button class="mt-2 btn btn-primary" type="submit"><i class="bi bi-box-arrow-in-right"> </i>Iniciar</button>
+    </form>
+    <p class="text-center">Aún no tienes cuenta? <a href="/signup">Crear cuenta</a>.</p>
+
+</div>
+
+{% endblock %}

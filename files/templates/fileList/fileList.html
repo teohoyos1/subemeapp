@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block titulo %} Listar Documentos {% endblock %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col-6 col-md-4">
+        <h1>Mis Documentos</h1>
+      </div>
+      <div class="col-6 col-md-8">
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-success text-right btn-sm" id="btnAddNew">
+            <i class="bi bi-file-earmark-plus"></i>
+            Añadir nuevo
+          </button>
+        </div>
+      </div>
+      <div class="col-12 col-md-12">
+        <div class="d-flex justify-content-end">
+          <form class="d-flex" action="/list/" method="GET">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="text" class="form-control " name="qr" placeholder="Buscar...">
+              <div class="input-group-append">
+                <span class="input-group-btn">
+                  <button class="btn btn-success" type="submit"><i class="bi bi-search"></i></button>
+                </span>
+              </div>
+            </div><!-- /input-group -->
+        </form>
+        </div>
+      </div>
+    </div>
+
+    {%for fatherObj in typeObjFather %}
+      <div class="accordion mt-3" id="accordionExample{{fatherObj.id}}">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDad{{fatherObj.id}}" aria-expanded="true" aria-controls="collapseDad{{fatherObj.id}}">
+              {{fatherObj.name}}
+            </button>
+          </h2>
+          <div id="collapseDad{{fatherObj.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample{{fatherObj.id}}">
+            <div class="accordion-body"> <!--Dad start body-->
+
+              {%for childObj in typeObjChild %}
+                {% if fatherObj.id == childObj.parentID %}
+                  <div class="accordion" id="accordionExample{{childObj.id}}">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{childObj.id}}" aria-expanded="true" aria-controls="collapseChild{{childObj.id}}">
+                          {{childObj.name}}
+                        </button>
+                      </h2>
+                      <div id="collapseChild{{childObj.id}}" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample{{childObj.id}}">
+                        <div class="accordion-body"> <!--Child start body-->
+                          <div class="row">
+                            <div class="col-6">
+                              <h4>Cedula de Ciudadania</h4>
+                              <p><strong>Archivo:</strong> <a href="#">1000895258.pdf</a></p>
+                              <!--<embed src="https://www.orimi.com/pdf-test.pdf" width="500" height="375" type="application/pdf">-->
+                            </div>
+                            <div class="col-6">
+                              <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                  <i class="bi bi-pencil-square"></i>
+                                  Editar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div> <!--Child end body-->
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+              
+
+              <div class="d-flex justify-content-end mt-2">
+                <div class="row">
+                  <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" >
+                      <i class="bi bi-file-earmark-arrow-down"></i>
+                      All in ZIP
+                    </button>
+                  </div>
+                  <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-file-earmark-arrow-down"></i>
+                      All in PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div> <!--Dad end body-->
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    <!--Modal Form Edit-Add-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Editar Cedula de Ciudadania</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="" method="POST">
+              <div class="mb-3">
+                <label for="typeDocument" class="form-label">Tipo de Documento:</label>
+                <input type="text" id="typeDocument" class="form-control" value="Cedula de Ciudadania"  disabled>
+              </div>
+              <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Descripción:</label>
+                <textarea class="form-control" id="description_text" rows="3"></textarea>
+              </div>
+              <div class="mb-3 form-check switcher">
+                <input type="checkbox" class="form-check-input" id="checkbox_file_toggle">
+                <label class="form-check-label" for="exampleCheck1">Cambiar archivo:</label>
+              </div>
+              <div class="mb-3">
+                <label for="fileInput" id="fileIpunt_label" class="form-label">Archivo:</label>
+                <input class="form-control" type="file" id="fileInput">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-sm"><i class="bi bi-file-earmark-arrow-up"></i>Guardar</button>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-file-earmark-x"></i>Eliminar</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!--mdl for sbm-->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Estas seguro de eliminarlo?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Estás apunto de eliminar #Cedula.
+            Una vez eliminado no lo tendrás hasta que lo crees nuevamente, si así lo deseas.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger btn-sm">Confirmo eliminarlo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script text="text/javascript">
+    jQuery(document).ready(function(){
+
+      jQuery('#fileInput').hide();
+      jQuery('#fileIpunt_label').hide();
+      jQuery('#checkbox_file_toggle').click(function() {
+        jQuery('#fileIpunt_label').toggle();
+        jQuery('#fileInput').toggle();
+        checkbox_file_validation();
+      });
+
+      jQuery('#exampleModal').on('hidden.bs.modal', function () {
+        jQuery('#exampleModal form')[0].reset();
+        jQuery('#fileInput').hide();
+        jQuery('#fileIpunt_label').hide();
+      });
+
+      redirect_new_form();
+
+    });
+
+    function checkbox_file_validation(){
+
+      if (!jQuery("#checkbox_file_toggle").is(":checked")) {
+            jQuery('#fileInput').val('');
+        }
+    }
+
+    function redirect_new_form(){
+      jQuery("#btnAddNew").on('click',function(){
+        window.location.href = "/add-file-page";
+
+      });
+    }
+  </script>
+
+{% endblock %}

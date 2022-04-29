@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block titulo %} Subeme-signup {% endblock %}
+
+{% block content %}
+
+<!--Register-->
+<div class="container py-5">
+	<h1>Crear cuenta</h1>
+	<div class="row">
+		<div class="col-12">
+			<div class="d-flex justify-content-center">
+				<form method="POST" novalidate>
+					{% csrf_token %}
+					{{ form |crispy }}
+					<button class="btn btn-primary" type="submit"><i class="bi bi-person-plus-fill"> </i>Registrarse</button>
+				</form>
+			</div>
+		</div>
+		<div class="col-12">
+			<p class="text-center">Si ya tienes una cuenta creada, <a href="/login">iniciar sesión</a> ingresando aquí.</p>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

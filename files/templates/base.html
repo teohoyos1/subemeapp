@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{% block titulo %}  {% endblock %}</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <style>
+            *{
+                font-family: 'Roboto', sans-serif;
+            }
+
+            #title-name-1,#title-name-2{
+                font-weight: 900;
+                font-size: 25px;
+            }
+            #title-name-2{
+                color: red;
+            }
+        </style>
+        {% block style %} {% endblock %}
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Ninth navbar example">
+            <div class="container-xl">
+                <a class="navbar-brand" id="title-name-1" href="#">Sube<strong id="title-name-2">me</strong></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07XL" aria-controls="navbarsExample07XL" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarsExample07XL">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Inicio</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/list">Mis Documentos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/add-file-page">Agregar Documentos</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/about">InfoApp</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                               <b>{{user.username}}</b>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/profile/">Perfil</a></li>
+                              <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signup">Registrarse</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% include "messages.html" %}
+
+        {% block content %}
+
+        {% endblock %}
+        
+        <!-- Footer-->
+        <footer class="text-center text-lg-start bg-dark mt-auto">
+            <div class="container d-flex justify-content-center py-5">
+                <button type="button" class="btn btn-primary btn-sm btn-floating mx-2" style="background-color: #2b58e7;">
+                    <i class="bi bi-facebook"></i>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-floating mx-2" style="background-color: #f44236;">
+                    <i class="bi bi-youtube"></i>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-floating mx-2" style="background-color: #ff6742;">
+                    <i class="bi bi-instagram"></i>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm btn-floating mx-2" style="background-color: #1da1f2;">
+                    <i class="bi bi-twitter fa-xs"></i>
+                </button>
+            </div>
+        
+            <!-- Copyright -->
+            <div class="text-center text-white p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2022 Copyright:
+            <a class="text-white" href="https://mdbootstrap.com/">Subeme.online</a>
+            </div>
+            <!-- Copyright -->
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+        {% block scripts %}
+        {% endblock %}
+        <script type="text/javascript">
+            setTimeout(function(){
+                if(jQuery("#msg_{{messages.tag}}").length > 0){
+                    jQuery("#msgdad_{{messages.tag}}").alert('close');
+                }
+            },2000);
+        </script>
+    </body>
+</html>
