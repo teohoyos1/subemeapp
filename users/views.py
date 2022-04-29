@@ -59,7 +59,7 @@ def loginUser(request):
                 context = {
                     "messages": msg
                 }
-                return redirect("/", context)
+                return render(request, 'home.html', context)
     else:
         form = AuthenticationForm()
     context={
