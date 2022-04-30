@@ -36,7 +36,6 @@ def about(request):
 #ADDPAGE - GROUP, TYPEFILE, FILE
 @login_required
 def redirect_to_new_file_page(request):
-    
     try:
         objGroupSelect = Fi_file_type.objects.filter(parentID=0).filter(isActive=1)
     except:
@@ -63,5 +62,5 @@ def file_group_create_new(request):
             return redirect('/add-file-page')
         else:
             print(form.errors)
-            messages.error(request, form.errors.get('message'))
+            # messages.error(request, form.errors.get('message'))
     return redirect('/add-file-page')
