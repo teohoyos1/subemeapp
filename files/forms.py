@@ -1,5 +1,6 @@
 from pyexpat import model
 from django import forms
+#from django.forms import ClearableFileInput
 from .models import Fi_file_type, Fi_file
 
 class Fi_file_typeForm(forms.ModelForm):
@@ -21,3 +22,6 @@ class Fi_fileForm(forms.ModelForm):
     class Meta:
         model = Fi_file
         fields = ['fileType','fileTypeName','fileDescription','files']
+        # widgets = {
+        #     'media': ClearableFileInput(attrs={'multiple': True})
+        # }

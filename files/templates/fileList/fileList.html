@@ -34,32 +34,42 @@
       </div>
     </div>
 
-    {%for fatherObj in typeObjFather %}
-      <div class="accordion mt-3" id="accordionExample{{fatherObj.id}}">
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDad{{fatherObj.id}}" aria-expanded="true" aria-controls="collapseDad{{fatherObj.id}}">
-              {{fatherObj.name}}
-            </button>
-          </h2>
-          <div id="collapseDad{{fatherObj.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample{{fatherObj.id}}">
-            <div class="accordion-body"> <!--Dad start body-->
+    <div class="col-12 w-75 m-auto">
+      <div class="accordion mt-3" id="accordionFatherTree">
+      {%for fatherObj in typeObjFather %}
+        
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFather{{fatherObj.id}}">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDad{{fatherObj.id}}" aria-expanded="true" aria-controls="collapseDad{{fatherObj.id}}">
+                {{fatherObj.name}}
+              </button>
+            </h2>
+            <div id="collapseDad{{fatherObj.id}}" class="accordion-collapse collapse" aria-labelledby="headingFather{{fatherObj.id}}" data-bs-parent="#accordionFatherTree">
+              <div class="accordion-body"> <!--Dad start body-->
 
-              {%for fileObj in filesParent %}
-                  {% if fatherObj.id == fileObj.fileType_id %}
-                    <div class="accordion" id="accordionExample{{childObj.id}}">
+                <div class="accordion" id="accordionChild{{fatherObj.id}}">
+                  {%for fileObj in filesParent %}
+                    {% if fatherObj.id == fileObj.fileType_id %}
                       <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{childObj.id}}" aria-expanded="true" aria-controls="collapseChild{{childObj.id}}">
+                        <h2 class="accordion-header" id="headingChild{{fileObj.id}}">
+                          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{fileObj.id}}" aria-expanded="true" aria-controls="collapseChild{{fileObj.id}}">
                             {{fileObj.fileTypeName}}
                           </button>
                         </h2>
-                        <div id="collapseChild{{childObj.id}}" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample{{childObj.id}}">
+                        <div id="collapseChild{{fileObj.id}}" class="accordion-collapse collapse " aria-labelledby="headingChild{{fileObj.id}}" data-bs-parent="#accordionChild{{fatherObj.id}}">
                           <div class="accordion-body"> <!--Child start body-->
                             <div class="row">
                               <div class="col-6">
-                                <h4>Cedula de Ciudadania</h4>
-                                <p><strong>Archivo:</strong> <a href="{{fileObj.files.url}}">{{fileObj.files.name}}</a></p>
+                                <h5>{{fileObj.fileTypeName}}</h5>
+                                {% if fileObj.fileDescription %}
+                                  <p><strong>Descripción: </strong>{{fileObj.fileDescription}}</p>
+                                {% endif %}
+                                {% if fileObj.files %}
+                                  <p>
+                                    <strong>Archivo:</strong>
+                                    <a href="{{fileObj.files.url}}" class="btn btn-outline-info btn-sm" target="_blank"> Descargar</a>
+                                  </p>
+                                {% endif %}
                                 <!--<embed src="https://www.orimi.com/pdf-test.pdf" width="500" height="375" type="application/pdf">-->
                               </div>
                               <div class="col-6">
@@ -74,32 +84,31 @@
                           </div> <!--Child end body-->
                         </div>
                       </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <div class="d-flex justify-content-end mt-2">
+                  <div class="row">
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="getAllZip('{{fatherObj.id}}')">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        All in ZIP
+                      </button>
                     </div>
-                {% endif %}
-              {% endfor %}
-
-              <div class="d-flex justify-content-end mt-2">
-                <div class="row">
-                  <div class="col-auto">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" >
-                      <i class="bi bi-file-earmark-arrow-down"></i>
-                      All in ZIP
-                    </button>
-                  </div>
-                  <div class="col-auto">
-                    <button type="button" class="btn btn-sm btn-outline-secondary">
-                      <i class="bi bi-file-earmark-arrow-down"></i>
-                      All in PDF
-                    </button>
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        All in PDF
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div> <!--Dad end body-->
+              </div> <!--Dad end body-->
+            </div>
           </div>
         </div>
-      </div>
-    {% endfor %}
-
+      {% endfor %}
+    </div>
     <!--Modal Form Edit-Add-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
@@ -196,6 +205,12 @@
         window.location.href = "/add-file-page";
 
       });
+    }
+
+    function getAllZip(fatherId){
+      console.log(fatherId)
+      
+
     }
   </script>
 

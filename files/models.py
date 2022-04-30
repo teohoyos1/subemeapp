@@ -1,8 +1,6 @@
-from unicodedata import name
 from django.db import models
-from .media import user_directory_path
 
-# Create your models here.
+# Create your models here CREADOTEO
 class Fi_file_type(models.Model):
     name = models.CharField(max_length=250) #foruser
     isActive = models.IntegerField(default=0) #interno
@@ -24,3 +22,7 @@ class Fi_file(models.Model):
     fileDescription = models.TextField(verbose_name='Descripción de archivo:') #foruser
     files = models.FileField(upload_to='docs/',null=True, blank=True,verbose_name='Archivo:') #interno JSON and foruser
     modified_date = models.DateTimeField(auto_now=True)
+
+    def delete(self, *args, **kwargs):
+        self.files.delete()
+        super().delete(*args, **kwargs)
