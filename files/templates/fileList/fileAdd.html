@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block titulo %} Agregar documento {% endblock %}
 
 {% block content %}
@@ -24,31 +26,7 @@
         {% csrf_token %}
         <div class="row">
             <div class="col-6 col-md-12 mt-3 w-50 m-auto">
-                <div class="mb-3">
-                    <label for="groupTypeSelect" class="form-label">Grupo:</label>
-                    <select class="form-control form-control-sm" id="groupTypeSelect" name="groupTypeSelect">
-                        <option value="" selected>Seleccione...</option>
-                        {% for data in objGroupSelect %}
-                            <option value="{{data.id}}">{{data.name}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Nombre de Documento:</label>
-                    <input type="nameTypeDocument" class="form-control form-control-sm" id="exampleInputEmail1" aria-describedby="nameTypeDocumentHelp">
-                    <div id="nameTypeDocumentHelp" class="form-text">Nombre para identificar el documento en el listado</div>
-                </div>
-                <div class="mb-3">
-                    <label for="fileInput" id="fileIpunt_label" class="form-label">Descripción de Archivo:</label>
-                    <textarea class="form-control form-control-sm" id="description_file" name="description_file" aria-describedby="nameTypeDocumentHelp"></textarea>
-                    <div id="document_fileHelp" class="form-text">Ingresa una descripción si deseas identificar mejor el contenido</div>
-                </div>
-                <div class="mb-3">
-                    <label for="fileInput" id="fileIpunt_label" class="form-label">Archivo:</label>
-                    <input class="form-control form-control-sm" type="file" id="document_file" name="document_file" aria-describedby="nameTypeDocumentHelp">
-                    <div id="document_fileHelp" class="form-text">Sube un documento, documentos permitidos: PDF Docx Doc csv csvc txt</div>
-                </div>
-                
+                {{ form_file|crispy }}
                 <button type="submit" class="btn btn-primary btn-sm">
                     <i class="bi bi-file-earmark-plus"></i>
                     Crear

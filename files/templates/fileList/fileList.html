@@ -45,39 +45,38 @@
           <div id="collapseDad{{fatherObj.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample{{fatherObj.id}}">
             <div class="accordion-body"> <!--Dad start body-->
 
-              {%for childObj in typeObjChild %}
-                {% if fatherObj.id == childObj.parentID %}
-                  <div class="accordion" id="accordionExample{{childObj.id}}">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{childObj.id}}" aria-expanded="true" aria-controls="collapseChild{{childObj.id}}">
-                          {{childObj.name}}
-                        </button>
-                      </h2>
-                      <div id="collapseChild{{childObj.id}}" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample{{childObj.id}}">
-                        <div class="accordion-body"> <!--Child start body-->
-                          <div class="row">
-                            <div class="col-6">
-                              <h4>Cedula de Ciudadania</h4>
-                              <p><strong>Archivo:</strong> <a href="#">1000895258.pdf</a></p>
-                              <!--<embed src="https://www.orimi.com/pdf-test.pdf" width="500" height="375" type="application/pdf">-->
-                            </div>
-                            <div class="col-6">
-                              <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                  <i class="bi bi-pencil-square"></i>
-                                  Editar
-                                </button>
+              {%for fileObj in filesParent %}
+                  {% if fatherObj.id == fileObj.fileType_id %}
+                    <div class="accordion" id="accordionExample{{childObj.id}}">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{childObj.id}}" aria-expanded="true" aria-controls="collapseChild{{childObj.id}}">
+                            {{fileObj.fileTypeName}}
+                          </button>
+                        </h2>
+                        <div id="collapseChild{{childObj.id}}" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample{{childObj.id}}">
+                          <div class="accordion-body"> <!--Child start body-->
+                            <div class="row">
+                              <div class="col-6">
+                                <h4>Cedula de Ciudadania</h4>
+                                <p><strong>Archivo:</strong> <a href="{{fileObj.files.url}}">{{fileObj.files.name}}</a></p>
+                                <!--<embed src="https://www.orimi.com/pdf-test.pdf" width="500" height="375" type="application/pdf">-->
+                              </div>
+                              <div class="col-6">
+                                <div class="d-flex justify-content-end">
+                                  <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                    Editar
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div> <!--Child end body-->
+                          </div> <!--Child end body-->
+                        </div>
                       </div>
                     </div>
-                  </div>
                 {% endif %}
               {% endfor %}
-              
 
               <div class="d-flex justify-content-end mt-2">
                 <div class="row">

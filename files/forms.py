@@ -1,12 +1,11 @@
 from pyexpat import model
 from django import forms
-from .models import Fi_file_type
+from .models import Fi_file_type, Fi_file
 
 class Fi_file_typeForm(forms.ModelForm):
     class Meta:
         model = Fi_file_type
-        fields = ['name','parentID','isActive']
-        exclude = ['parentID']
+        fields = ['name','isActive']
 
 
     def clean(self):
@@ -16,3 +15,9 @@ class Fi_file_typeForm(forms.ModelForm):
         if qs.exists():
             self.add_error('name',f'El nombre del grupo {name} ya se encuentra creado.')
         return data
+
+class Fi_fileForm(forms.ModelForm):
+
+    class Meta:
+        model = Fi_file
+        fields = ['fileType','fileTypeName','fileDescription','files']

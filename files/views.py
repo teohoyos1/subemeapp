@@ -1,11 +1,12 @@
+from multiprocessing import context
 from queue import Empty
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required #CREADOTEO
 from django.contrib import messages
 import os
-from .models import Fi_file_type
-from .forms import Fi_file_typeForm
+from .models import Fi_file, Fi_file_type
+from .forms import Fi_file_typeForm, Fi_fileForm
 
 def index(request):
     SECRET_KEYj = os.getenv("ENVIRONMENT_MODE")
@@ -22,11 +23,12 @@ def get_file_type_list(request):
     except:
         query=""
 
-    typeObjFather = Fi_file_type.objects.all().order_by('id').filter(parentID=0).filter(name__contains=query)
-    typeObjChild = Fi_file_type.objects.all().order_by('parentID').exclude(parentID=0).filter(name__contains=query)
+    typeObjFather = Fi_file_type.objects.all().order_by('id').filter(name__contains=query)
+    filesParent = Fi_file.objects.all().order_by('fileType_id')
+    # typeObjChild = Fi_file_type.objects.all().filter(name__contains=query)
     context = {
         'typeObjFather':typeObjFather,
-        'typeObjChild': typeObjChild,
+         'filesParent': filesParent
     }
     return render(request, 'fileList/fileList.html', context)
 
@@ -35,14 +37,23 @@ def about(request):
 
 #ADDPAGE - GROUP, TYPEFILE, FILE
 @login_required
-def redirect_to_new_file_page(request):
+def file_create_new(request):
+    context = {}
+    if request.method == 'POST':
+        form = Fi_fileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Archivo creado con éxito')
+            return redirect(file_create_new)
+    else:
+        form = Fi_fileForm()
     try:
-        objGroupSelect = Fi_file_type.objects.filter(parentID=0).filter(isActive=1)
+        objGroupSelect = Fi_file_type.objects.filter(isActive=1)
     except:
         objGroupSelect = None
-
     context = {
-        'objGroupSelect': objGroupSelect,
+        'form_file':form,
+        'objGroupSelect': objGroupSelect
     }
     return render(request, 'fileList/fileAdd.html',context)
 
@@ -56,8 +67,7 @@ def file_group_create_new(request):
         context['form'] = form
 
         if form.is_valid():
-            obj = form.save()
-            print(obj,'OBJETICO ')
+            form.save()
             messages.success(request, f"Se ha guardado correctamente el grupo")
             return redirect('/add-file-page')
         else:
