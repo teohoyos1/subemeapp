@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from distutils.log import debug
+import os
 from pathlib import Path
 from os import getenv
 from django.contrib.messages import constants as messages
@@ -152,3 +153,9 @@ MESSAGE_TAGS = {
 
 #CREADOTEO ADD FOR URL FOR RESTRICTED ACCESS
 LOGIN_URL = 'login'
+
+#CREADOTEO
+#For S3 this will changes
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
