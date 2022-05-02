@@ -1,7 +1,7 @@
 from multiprocessing import context
 from queue import Empty
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required #CREADOTEO
 from django.contrib import messages
 import os
@@ -74,3 +74,12 @@ def file_group_create_new(request):
             print(form.errors)
             # messages.error(request, form.errors.get('message'))
     return redirect('/add-file-page')
+
+def generateAllOnePdf(request):
+
+    if request.is_ajax() and request.method == "POST":
+        # number = request.POST.get('id')
+        dataa = "Holi"
+        return JsonResponse({'data': dataa})
+
+    return JsonResponse({'error':"Errores mi papa"}, status_code=201)

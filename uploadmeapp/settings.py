@@ -30,7 +30,7 @@ DEBUG = str(getenv('DEBUG')) == "1"
 
 ALLOWED_HOSTS = []
 
-if not DEBUG:
+if not DEBUG :
     ALLOWED_HOSTS += [getenv('ALLOWED_HOST')]
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     #CREADOTEO
     'crispy_forms',
     "crispy_bootstrap5",
+    'storages',
     'files',
     'users',
 ]
@@ -156,6 +157,18 @@ LOGIN_URL = 'login'
 
 #CREADOTEO
 #For S3 this will changes
-MEDIA_URL = '/media/'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+if str(getenv('USE_S3_CLOUD'))=="1":
+    # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'uploadmeapp.storage_backends.PublicMediaStorage'
+    AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID_ENV')
+    AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY_ENV')
+    AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME_ENV')
+    AWS_QUERYSTRING_AUTH = False
+    AWS_DEFAULT_ACL = None
+    MEDIA_URL = getenv('AWS_MEDIA_URL')
+    AWS_S3_FILE_OVERWRITE = False
+else:
+    # STATIC_URL = '/staticfiles/'
+    # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

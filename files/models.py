@@ -19,7 +19,7 @@ class Fi_file_type(models.Model):
 class Fi_file(models.Model):
     fileType = models.ForeignKey(Fi_file_type, verbose_name='Grupo:', help_text="Seleccione...", on_delete=models.CASCADE)
     fileTypeName = models.CharField(max_length=250, verbose_name='Nombre de Documento:',help_text='Prueba texto')
-    fileDescription = models.TextField(verbose_name='Descripción de archivo:') #foruser
+    fileDescription = models.TextField(verbose_name='Descripción de archivo:',blank=True,null=True) #foruser
     files = models.FileField(upload_to='docs/',null=True, blank=True,verbose_name='Archivo:') #interno JSON and foruser
     modified_date = models.DateTimeField(auto_now=True)
 

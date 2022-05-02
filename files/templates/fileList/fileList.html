@@ -96,7 +96,7 @@
                       </button>
                     </div>
                     <div class="col-auto">
-                      <button type="button" class="btn btn-sm btn-outline-secondary">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" >
                         <i class="bi bi-file-earmark-arrow-down"></i>
                         All in PDF
                       </button>
@@ -209,6 +209,24 @@
 
     function getAllZip(fatherId){
       console.log(fatherId)
+      jQuery.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "{% url 'generatePdfAjax' %}",
+        data: {
+          id: fatherId,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+          var instance = JSON.parse(response["instance"]);
+          console.log(instance)
+        },
+        error: function (response) {
+                // alert the error if any error occured
+                alert(response["error"]);
+            }
+
+      });
       
 
     }

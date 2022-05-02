@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from os import getenv
 
 #for media if debug is true in localhost
 from django.conf import settings
@@ -27,5 +28,5 @@ urlpatterns = [
 ]
 
 #CREADOTEO for media
-if settings.DEBUG:
+if settings.DEBUG and str(getenv('USE_S3_CLOUD')) != '1':
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
