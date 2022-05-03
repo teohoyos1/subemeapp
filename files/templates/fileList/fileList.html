@@ -36,8 +36,7 @@
 
     <div class="col-12 w-75 m-auto">
       <div class="accordion mt-3" id="accordionFatherTree">
-      {%for fatherObj in typeObjFather %}
-        
+        {%for fatherObj in typeObjFather %}
           <div class="accordion-item">
             <h2 class="accordion-header" id="headingFather{{fatherObj.id}}">
               <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDad{{fatherObj.id}}" aria-expanded="true" aria-controls="collapseDad{{fatherObj.id}}">
@@ -51,6 +50,7 @@
                   {%for fileObj in filesParent %}
                     {% if fatherObj.id == fileObj.fileType_id %}
                       <div class="accordion-item">
+                        <input type="hidden" id="fatherHidden{{fatherObj.id}}">
                         <h2 class="accordion-header" id="headingChild{{fileObj.id}}">
                           <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChild{{fileObj.id}}" aria-expanded="true" aria-controls="collapseChild{{fileObj.id}}">
                             {{fileObj.fileTypeName}}
@@ -89,16 +89,9 @@
                 </div>
                 <div class="d-flex justify-content-end mt-2">
                   <div class="row">
-                    <div class="col-auto">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="getAllZip('{{fatherObj.id}}')">
-                        <i class="bi bi-file-earmark-arrow-down"></i>
-                        All in ZIP
-                      </button>
-                    </div>
-                    <div class="col-auto">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" >
-                        <i class="bi bi-file-earmark-arrow-down"></i>
-                        All in PDF
+                    <div class="col-auto" id="btn-zip{{fatherObj.id}}">
+                      <button type="button" class="btn btn-sm btn-secondary" id="btn-generate-zip{{fatherObj.id}}" onclick="getAllZip('{{fatherObj.id}}','{{fatherObj.name}}')">
+                        Generar Zip
                       </button>
                     </div>
                   </div>
@@ -106,8 +99,8 @@
               </div> <!--Dad end body-->
             </div>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
     <!--Modal Form Edit-Add-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -207,28 +200,51 @@
       });
     }
 
-    function getAllZip(fatherId){
-      console.log(fatherId)
-      jQuery.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "{% url 'generatePdfAjax' %}",
-        data: {
-          id: fatherId,
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(response) {
-          var instance = JSON.parse(response["instance"]);
-          console.log(instance)
-        },
-        error: function (response) {
-                // alert the error if any error occured
-                alert(response["error"]);
-            }
+    function getAllZip(fatherId,fatherName){
 
-      });
-      
+      if(jQuery("#fatherHidden"+fatherId).length){
+        jQuery("#linkZipFile"+fatherId).remove();
+        jQuery.ajax({
+          type: 'POST',
+          url: "{% url 'generateZipAjax' %}",
+          xhrFields:{
+              responseType: 'blob'
+          },
+          data: {
+            id: fatherId,
+            name: fatherName,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+          },
+          success: function(response, status, xhr) {
+            var fileName = xhr.getResponseHeader('content-disposition').split('filename=')[1].split(';')[0]
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(response);
+            link.download = fileName;
+            link.text = "Descargar";
+            link.className = "btn btn-primary btn-sm";
+            link.id = "linkZipFile"+fatherId
+            spinnerEffect(fatherId,true);
+            setTimeout(() => {
+              spinnerEffect(fatherId,false);
+              jQuery("#btn-zip"+fatherId).append(link);
+              jQuery("#btn-generate-zip"+fatherId).prop('disabled', true);
+            }, 3000);
+          },
+          error: function(response,xhr, textStatus, errorThrown) {
+                  console.log(xhr);
+              }
+        });
+      }else{
+        alert("No puedes generar un zip porque no tienes documentos adentro");
+      }
+    }
 
+    function spinnerEffect(id,status){
+      if(status){
+        jQuery("#btn-generate-zip"+id).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerId'+id+'"></span>');
+      }else{
+        span = jQuery("#spinnerId"+id).remove();
+      }
     }
   </script>
 

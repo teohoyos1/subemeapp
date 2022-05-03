@@ -8,5 +8,5 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('add-file-page/', views.file_create_new, name='addNewFilePage'),
     path('add-file-page/new-group/',views.file_group_create_new, name='createFileGroup'),
-    path('list/ajax/generatepdf/',views.generateAllOnePdf, name="generatePdfAjax")
+    path('list/ajax/generatepdf/',views.generateZipAjax, name="generateZipAjax")
 ]

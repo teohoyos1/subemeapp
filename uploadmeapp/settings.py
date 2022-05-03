@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from distutils.log import debug
 import os
 from pathlib import Path
-from os import getenv
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,14 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(getenv('DEBUG')) == "1"
+DEBUG = str(os.getenv('DEBUG')) == "1"
 
 ALLOWED_HOSTS = []
 
 if not DEBUG :
-    ALLOWED_HOSTS += [getenv('ALLOWED_HOST')]
+    ALLOWED_HOSTS += [os.getenv('ALLOWED_HOST')]
 
 # Application definition
 
@@ -92,11 +91,11 @@ WSGI_APPLICATION = 'uploadmeapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': getenv('DATABASE_NAME'),
-        'USER': getenv('DATABASE_USER'),
-        'PASSWORD': getenv('DATABASE_PASSWORD'),
-        'HOST': getenv('DATABASE_HOST'),
-        'PORT': getenv('DATABASE_PORT'),
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -135,7 +134,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = getenv('PROJECT_STATIC_URL')
+STATIC_URL = os.getenv('PROJECT_STATIC_URL')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -157,15 +156,15 @@ LOGIN_URL = 'login'
 
 #CREADOTEO
 #For S3 this will changes
-if str(getenv('USE_S3_CLOUD'))=="1":
+if str(os.getenv('USE_S3_CLOUD'))=="1":
     # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     DEFAULT_FILE_STORAGE = 'uploadmeapp.storage_backends.PublicMediaStorage'
-    AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID_ENV')
-    AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY_ENV')
-    AWS_STORAGE_BUCKET_NAME = getenv('AWS_STORAGE_BUCKET_NAME_ENV')
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID_ENV')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY_ENV')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME_ENV')
     AWS_QUERYSTRING_AUTH = False
     AWS_DEFAULT_ACL = None
-    MEDIA_URL = getenv('AWS_MEDIA_URL')
+    MEDIA_URL = os.getenv('AWS_MEDIA_URL')
     AWS_S3_FILE_OVERWRITE = False
 else:
     # STATIC_URL = '/staticfiles/'
