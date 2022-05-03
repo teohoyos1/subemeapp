@@ -5,6 +5,9 @@ Subeme App is a web app to upload files.
 
 CRUD File
 CRUD File Group
+S3 Upload File, and list
+ZIP documents in one file (LocalHost and S3 works)
+
 
 Admin by Django
 
