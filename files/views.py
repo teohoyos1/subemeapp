@@ -12,15 +12,22 @@ try:
     compression = zipfile.ZIP_DEFLATED
 except:
     compression = zipfile.ZIP_STORED
-
+from rest_framework import viewsets
 
 from .models import Fi_file, Fi_file_type
 from .forms import Fi_file_typeForm, Fi_fileForm
+from files import serializers
+
+class FileView(viewsets.ModelViewSet):
+    serializer_class = serializers.Fi_file_serializer
+    queryset = Fi_file.objects.all()
+
+class FileTypeView(viewsets.ModelViewSet):
+    serializer_class = serializers.Fi_file_type_serializer
+    queryset = Fi_file_type.objects.all()
 
 def index(request):
-    SECRET_KEYj = os.getenv("ENVIRONMENT_MODE")
-    print(SECRET_KEYj)
-    return render(request, 'home.html', {'envi': SECRET_KEYj})
+    return render(request, 'home.html')
 
 @login_required
 def get_file_type_list(request):

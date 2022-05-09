@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     "crispy_bootstrap5",
     'storages',
+    'corsheaders',
+    'rest_framework',
     'files',
     'users',
 ]
@@ -62,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'uploadmeapp.urls'
@@ -171,3 +174,8 @@ else:
     # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+#CREADOTEO - Corsheaders
+CORS_ORIGIN_WHITELIST = [
+     'http://localhost:3000'
+]
