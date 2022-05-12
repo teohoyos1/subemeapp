@@ -26,6 +26,9 @@ def signupUser(request):
     }
     return render(request, "registration/signup.html", context)
 
+def get_robot_file(request):
+    return render(request, 'robots.txt',content_type='text/plain')
+
 def loginUser(request):
     if request.user.is_authenticated:
         return redirect("/")

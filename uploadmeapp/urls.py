@@ -16,20 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from os import getenv
-from rest_framework import routers
 from django.conf import settings #for media if debug is true in localhost
 from django.conf.urls.static import static
-from files import views
-
-router = routers.DefaultRouter()
-router.register(r'file', views.FileView,'file')
-router.register(r'file_type',views.FileTypeView,'file_type')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('files.urls')),
-    path('', include('users.urls')),
-    path('api/', include(router.urls)),
+    path('', include('users.urls'))
 ]
 
 #CREADOTEO for media

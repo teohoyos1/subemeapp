@@ -11,7 +11,7 @@
       </div>
       <div class="col-6 col-md-8">
         <div class="d-flex justify-content-end">
-          <button type="button" class="btn btn-success text-right btn-sm" id="btnAddNew">
+          <button type="button" class="btn btn-primary text-right btn-sm" id="btnAddNew">
             <i class="bi bi-file-earmark-plus"></i>
             Añadir nuevo
           </button>
@@ -20,12 +20,11 @@
       <div class="col-12 col-md-12">
         <div class="d-flex justify-content-end">
           <form class="d-flex" action="/list/" method="GET">
-            {% csrf_token %}
             <div class="input-group">
               <input type="text" class="form-control " name="qr" placeholder="Buscar...">
               <div class="input-group-append">
                 <span class="input-group-btn">
-                  <button class="btn btn-success" type="submit"><i class="bi bi-search"></i></button>
+                  <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass fa-sm"></i></button>
                 </span>
               </div>
             </div><!-- /input-group -->
@@ -74,10 +73,12 @@
                               </div>
                               <div class="col-6">
                                 <div class="d-flex justify-content-end">
-                                  <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                    Editar
-                                  </button>
+                                  <a href="#" class="text-primary me-2">
+                                    <i class="fa-solid fa-pen-to-square fa-lg" onclick="getFileObjData({{fileObj.pk}})" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+                                  </a>
+                                  <a href="{% url 'deleteFile' id=fileObj.pk %}" class="text-danger">
+                                    <i class="fa-solid fa-trash-can fa-lg"></i>
+                                  </a>
                                 </div>
                               </div>
                             </div>
@@ -90,8 +91,9 @@
                 <div class="d-flex justify-content-end mt-2">
                   <div class="row">
                     <div class="col-auto" id="btn-zip{{fatherObj.id}}">
-                      <button type="button" class="btn btn-sm btn-secondary" id="btn-generate-zip{{fatherObj.id}}" onclick="getAllZip('{{fatherObj.id}}','{{fatherObj.name}}')">
-                        Generar Zip
+                      <button type="button" class="btn btn-sm btn-primary" id="btn-generate-zip{{fatherObj.id}}" onclick="getAllZip('{{fatherObj.id}}','{{fatherObj.name}}')">
+                        <i class="fa-solid fa-file-zipper fa-lg"></i>
+                        Generar zip
                       </button>
                     </div>
                   </div>
@@ -107,18 +109,21 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Editar Cedula de Ciudadania</h5>
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="" method="POST">
+            <p class="fst-italic" id="parent-breadcrumbs"></p>
+            <form id="formFileEdit" action="{% url 'getAndUpdateFileAjax' %}" method="POST">
+              <input type="hidden" id="idFormFile" name="id">
+              {% csrf_token %}
               <div class="mb-3">
                 <label for="typeDocument" class="form-label">Tipo de Documento:</label>
-                <input type="text" id="typeDocument" class="form-control" value="Cedula de Ciudadania"  disabled>
+                <input type="text" id="typeDocument" name="fileTypeName" class="form-control">
               </div>
               <div class="mb-3">
                 <label for="exampleFormControlTextarea1" class="form-label">Descripción:</label>
-                <textarea class="form-control" id="description_text" rows="3"></textarea>
+                <textarea class="form-control" id="description_text" name="fileDescription" rows="3"></textarea>
               </div>
               <div class="mb-3 form-check switcher">
                 <input type="checkbox" class="form-check-input" id="checkbox_file_toggle">
@@ -126,13 +131,12 @@
               </div>
               <div class="mb-3">
                 <label for="fileInput" id="fileIpunt_label" class="form-label">Archivo:</label>
-                <input class="form-control" type="file" id="fileInput">
+                <input class="form-control" type="file" id="fileInput" name="files">
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary btn-sm"><i class="bi bi-file-earmark-arrow-up"></i>Guardar</button>
-            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-file-earmark-x"></i>Eliminar</button>
+            <button type="button" onclick="jQuery('form#formFileEdit').submit();" class="btn btn-primary btn-sm"><i class="bi bi-file-earmark-arrow-up"></i>Guardar</button>
             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
@@ -245,6 +249,31 @@
       }else{
         span = jQuery("#spinnerId"+id).remove();
       }
+    }
+
+    function getFileObjData(idObj){
+      console.log(idObj);
+
+      jQuery.ajax({
+        type: "GET",
+        url: "{% url 'getAndUpdateFileAjax' %}",
+        dataType:"json",
+        data: {
+          id: idObj,
+        },
+        success: function(response, status, xhr) {
+          var data = response["response"];
+          jQuery("#idFormFile").val(data.id);
+          jQuery("#exampleModalLabel").text(data.fileName);
+          jQuery("#parent-breadcrumbs").text(data.fileTypeName+" > "+data.fileName);
+          jQuery("#typeDocument").val(data.fileName);
+          jQuery("#description_text").val(data.fileDescription);
+
+        },
+        error: function(response,xhr, textStatus, errorThrown) {
+                console.log(xhr);
+        }
+      });
     }
   </script>
 

@@ -25,3 +25,13 @@ class Fi_fileForm(forms.ModelForm):
         # widgets = {
         #     'media': ClearableFileInput(attrs={'multiple': True})
         # }
+
+class Fi_fileFormEditWOFile(forms.ModelForm):
+    class Meta:
+        model = Fi_file
+        fields = ['fileTypeName','fileDescription']
+
+class Fi_fileFormEditWithFile(forms.ModelForm):
+    class Meta:
+        model = Fi_file
+        fields = ['fileTypeName','fileDescription','files']

@@ -1,12 +1,13 @@
 from multiprocessing import context
 import os
-from django.shortcuts import render, redirect
+from django.core import serializers
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required #CREADOTEO
 from django.contrib import messages
 import zipfile
 import io
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 try:
     import zlib
     compression = zipfile.ZIP_DEFLATED
@@ -15,15 +16,15 @@ except:
 from rest_framework import viewsets
 
 from .models import Fi_file, Fi_file_type
-from .forms import Fi_file_typeForm, Fi_fileForm
-from files import serializers
+from .forms import Fi_file_typeForm, Fi_fileForm, Fi_fileFormEditWOFile, Fi_fileFormEditWithFile
+from files.serializers import Fi_file_serializer,Fi_file_type_serializer
 
 class FileView(viewsets.ModelViewSet):
-    serializer_class = serializers.Fi_file_serializer
+    serializer_class = Fi_file_serializer
     queryset = Fi_file.objects.all()
 
 class FileTypeView(viewsets.ModelViewSet):
-    serializer_class = serializers.Fi_file_type_serializer
+    serializer_class = Fi_file_type_serializer
     queryset = Fi_file_type.objects.all()
 
 def index(request):
@@ -92,6 +93,19 @@ def file_group_create_new(request):
             # messages.error(request, form.errors.get('message'))
     return redirect('/add-file-page')
 
+def deleteFileById(request, id):
+    if request.method == "GET":
+        try:
+            obj = Fi_file.objects.get(pk=id)
+        except Fi_file.DoesNotExist:
+            obj = None
+        if obj:
+            obj.delete()
+            messages.success(request, "Se ha eliminado con éxito")
+        else:
+            messages.error(request, "Se ha producido un error, no se ha podido eliminar el archivo")
+    return redirect("/list")
+
 def generateZipAjax(request):
     if request.method == "POST":
         if request.POST.get('id'):
@@ -127,3 +141,32 @@ def generateZipAjax(request):
                 return response
 
     return HttpResponse("error", content_type="text/plain")
+
+def getAndUpdateFileObject(request):
+    fileObj = None
+    if request.method == "GET" and request.GET.get('id')!= None:
+        id = request.GET.get('id')
+        fileObj = get_object_or_404(Fi_file, pk=id)
+        print(fileObj)
+        data = {
+            "id":fileObj.pk,
+            "fileTypeName":fileObj.fileType.name,
+            "fileName":fileObj.fileTypeName,
+            "fileDescription":fileObj.fileDescription
+            }
+        return JsonResponse({"response":data})
+
+    elif request.method == "POST":
+        id = request.POST.get('id')
+        print(request.FILES, " fumo?")
+        fileObj = get_object_or_404(Fi_file, pk=id)
+        if 'files' in request.FILES:
+            form = Fi_fileFormEditWithFile(request.POST, request.FILES, instance=fileObj)
+        else:
+            form = Fi_fileFormEditWOFile(request.POST, instance=fileObj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Se ha actualizado correctamente el documento")
+        else:
+            messages.error(request, form.errors)
+    return redirect("/list")
