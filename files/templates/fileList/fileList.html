@@ -66,7 +66,10 @@
                                 {% if fileObj.files %}
                                   <p>
                                     <strong>Archivo:</strong>
-                                    <a href="{{fileObj.files.url}}" class="btn btn-outline-info btn-sm" target="_blank"> Descargar</a>
+                                    <a href="{{fileObj.files.url}}" class="btn btn-primary btn-sm" target="_blank">
+                                      <i class="fa-solid fa-file-arrow-down"></i>
+                                      Descargar
+                                    </a>
                                   </p>
                                 {% endif %}
                                 <!--<embed src="https://www.orimi.com/pdf-test.pdf" width="500" height="375" type="application/pdf">-->
