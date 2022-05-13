@@ -15,7 +15,7 @@
     <div class="row">
         {% if request.user.is_superuser %}
             <div class="col-12 col-md-12 mt-3">
-                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalGroup1">
+                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalGroup1" onclick="openInHomeTab()">
                     <i class="bi bi-pencil-square"></i>
                     Grupos
                 </button>
@@ -45,10 +45,7 @@
                           <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Grupos</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Tipo Grupos</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Añadir/Editar</button>
+                          <button class="nav-link disabled" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">Editar</button>
                         </li>
                       </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -57,7 +54,7 @@
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                             <p class="fw-normal"><strong>Grupos:</strong> Un grupo deber ser creado para que dentro de el puedan estar documentos</p>
-                            <form action="/add-file-page/new-group/" method="POST">
+                            <form action="{% url 'createFileGroup' %}" method="POST">
                                 {% csrf_token %}
                                 <div class="row justify-content-center align-items-center minh-100">
                                     <div class="col-6">
@@ -72,7 +69,7 @@
                                         </div>
                                     </div>
                                     <div class="col-3 mt-4 text-center">
-                                        <button class="btn btn-primary btn-sm" id="btnGroupSend" type="submit">Guardar</button>
+                                        <button class="btn btn-primary btn-sm" id="btnGroupSend" type="submit">Crear</button>
                                     </div>
                                 </div>
                             </form>
@@ -102,17 +99,41 @@
                                             {% endif %}
                                         </div>
                                         <div class="col">
-                                            <button class="btn btn-outline-danger btn-sm" id="btnDeleteGroup" onclick="delfun('{{data.id}}');"><i class="bi bi-trash"></i></button>
+                                            <a href="#" class="text-primary text-decoration-none me-2" id="edit-tab" onclick="getUpdateTab('{{data.pk}}','{{data.name}}','{{data.isActive}}')">
+                                                <i class="fa-solid fa-pen-to-square fa-lg"></i>
+                                            </a>
+                                            <a href="{% url 'deleteGroup' id=data.pk %}" class="text-danger" id="btnDeleteGroup">
+                                                <i class="fa-solid fa-trash-can fa-lg"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 {% endfor %}
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                            
-                        </div>
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-
+                            <p class="fw-normal">
+                                Actualiza el grupo
+                            </p>
+                            <form action="{% url 'editFileGroup' %}" method="POST">
+                                <input type="hidden" id="fileIdInput" name="id">
+                                {% csrf_token %}
+                                <div class="row justify-content-center align-items-center minh-100">
+                                    <div class="col-6">
+                                        <label for="typeDocument" class="form-label">Nombre de grupo:</label>
+                                        <input class="form-control form-control-sm" type="text" id="groupNameUpdate" name="name" placeholder="Ingrese el nombre del grupo">
+                                    </div>
+                                    <div class="col-3 text-center">
+                                        <label class="form-check-label" for="flexSwitchCheckChecked">Activar:</label>
+                                        <div class="form-check form-switch mt-3 d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="activateGroupUpdate">
+                                            <input type="hidden" name="isActive" id="isActiveHiddenUpdate">
+                                        </div>
+                                    </div>
+                                    <div class="col-3 mt-4 text-center">
+                                        <button class="btn btn-primary btn-sm" id="btnUpdateGroup" type="submit">Actualizar</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -141,10 +162,40 @@
                 }
             });
 
+            jQuery("#btnUpdateGroup").click(function(){
+                if (jQuery("#activateGroupUpdate").is(":checked")) {
+                    jQuery('#isActiveHiddenUpdate').val(1);
+                }else{
+                    jQuery('#isActiveHiddenUpdate').val(0);
+                }
+            });
+
             jQuery('#modalGroup1').on('hidden.bs.modal', function () {
             jQuery('#modalGroup1 form')[0].reset();
             });
         });
+
+        function openInHomeTab(){
+            var someTabTriggerEl = document.querySelector('#home-tab');
+            var tab = new bootstrap.Tab(someTabTriggerEl);
+            tab.show();
+        }
+
+        function getUpdateTab(pkFile, fileName,active){
+            var someTabTriggerEl = document.querySelector('#contact-tab');
+            var tab = new bootstrap.Tab(someTabTriggerEl);
+            tab.show();
+
+            jQuery("#fileIdInput").val(pkFile);
+            jQuery("#groupNameUpdate").val(fileName);
+            jQuery('#isActiveHiddenUpdate').val(active);
+            if (jQuery('#isActiveHiddenUpdate').val() === '1') {
+                jQuery('#activateGroupUpdate').prop('checked', true);
+            }else{
+                jQuery('#activateGroupUpdate').prop('checked', false);
+            }
+
+        }
     </script>
 
 {% endblock %}

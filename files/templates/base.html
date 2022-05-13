@@ -50,14 +50,14 @@
                         </li>
                         {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/list">Mis Documentos</a>
+                            <a class="nav-link" href="{% url 'listFile' %}">Mis Documentos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/add-file-page">Agregar Documentos</a>
+                            <a class="nav-link" href="{% url 'listGroup' %}">Agregar Documentos</a>
                         </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/about">InfoApp</a>
+                            <a class="nav-link" href="{% url 'about' %}">InfoApp</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav mb-2 mb-lg-0">
@@ -125,7 +125,7 @@
                 if(jQuery("#msg_{{messages.tag}}").length > 0){
                     jQuery("#msgdad_{{messages.tag}}").alert('close');
                 }
-            },2000);
+            },4000);
         </script>
     </body>
 </html>

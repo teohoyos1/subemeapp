@@ -1,5 +1,8 @@
-from pyexpat import model
 from django import forms
+import os
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+import boto3
 #from django.forms import ClearableFileInput
 from .models import Fi_file_type, Fi_file
 
@@ -9,15 +12,9 @@ class Fi_file_typeForm(forms.ModelForm):
         fields = ['name','isActive']
 
 
-    def clean(self):
-        data = self.cleaned_data
-        name = data.get('name')
-        qs = Fi_file_type.objects.filter(name__icontains=name)
-        if qs.exists():
-            self.add_error('name',f'El nombre del grupo {name} ya se encuentra creado.')
-        return data
-
 class Fi_fileForm(forms.ModelForm):
+
+    fileType = forms.ModelChoiceField(queryset=Fi_file_type.objects.filter(isActive=1),empty_label="Seleccione...", label="Grupo:")
 
     class Meta:
         model = Fi_file
@@ -32,6 +29,27 @@ class Fi_fileFormEditWOFile(forms.ModelForm):
         fields = ['fileTypeName','fileDescription']
 
 class Fi_fileFormEditWithFile(forms.ModelForm):
+
+    # def __init__(self, *args, **kwargs):
+    #     self._pwd = kwargs.pop('pwd', None)
+    #     super().__init__(*args, **kwargs)
+
     class Meta:
         model = Fi_file
         fields = ['fileTypeName','fileDescription','files']
+
+
+    def save(self, *args, **kwargs):
+        try:
+            this = Fi_file.objects.get(id=self.instance.id)
+            if this.files:
+                if str(os.getenv('USE_S3_CLOUD'))=="1":
+                    s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+                    path = os.path.join(settings.MEDIA_ROOT, this.files.name)
+                    s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=path)
+                else:
+                    path ="."+this.files.url
+                    os.remove(path)
+        except ObjectDoesNotExist:
+            pass
+        super(Fi_fileFormEditWithFile, self).save(*args, **kwargs)

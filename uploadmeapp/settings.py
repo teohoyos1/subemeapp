@@ -169,6 +169,7 @@ if str(os.getenv('USE_S3_CLOUD'))=="1":
     AWS_DEFAULT_ACL = None
     MEDIA_URL = os.getenv('AWS_MEDIA_URL')
     AWS_S3_FILE_OVERWRITE = False
+    MEDIA_ROOT = 'media/'
 else:
     # STATIC_URL = '/staticfiles/'
     # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

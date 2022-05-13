@@ -19,7 +19,7 @@
       </div>
       <div class="col-12 col-md-12">
         <div class="d-flex justify-content-end">
-          <form class="d-flex" action="/list/" method="GET">
+          <form class="d-flex" action="{% url 'listFile' %}" method="GET">
             <div class="input-group">
               <input type="text" class="form-control " name="qr" placeholder="Buscar...">
               <div class="input-group-append">
@@ -73,8 +73,8 @@
                               </div>
                               <div class="col-6">
                                 <div class="d-flex justify-content-end">
-                                  <a href="#" class="text-primary me-2">
-                                    <i class="fa-solid fa-pen-to-square fa-lg" onclick="getFileObjData({{fileObj.pk}})" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+                                  <a href="#" class="text-primary me-2" onclick="getFileObjData({{fileObj.pk}})" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                    <i class="fa-solid fa-pen-to-square fa-lg"></i>
                                   </a>
                                   <a href="{% url 'deleteFile' id=fileObj.pk %}" class="text-danger">
                                     <i class="fa-solid fa-trash-can fa-lg"></i>
@@ -114,7 +114,7 @@
           </div>
           <div class="modal-body">
             <p class="fst-italic" id="parent-breadcrumbs"></p>
-            <form id="formFileEdit" action="{% url 'getAndUpdateFileAjax' %}" method="POST">
+            <form id="formFileEdit" action="{% url 'getAndUpdateFileAjax' %}" enctype="multipart/form-data" method="POST">
               <input type="hidden" id="idFormFile" name="id">
               {% csrf_token %}
               <div class="mb-3">
@@ -199,7 +199,7 @@
 
     function redirect_new_form(){
       jQuery("#btnAddNew").on('click',function(){
-        window.location.href = "/add-file-page";
+        window.location.href = "{% url 'listGroup' %}";
 
       });
     }

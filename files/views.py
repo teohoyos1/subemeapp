@@ -1,13 +1,13 @@
 from multiprocessing import context
 import os
-from django.core import serializers
+from django.db.models import RestrictedError
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required #CREADOTEO
 from django.contrib import messages
 import zipfile
 import io
-from urllib.request import Request, urlopen
+from urllib.request import urlopen
 try:
     import zlib
     compression = zipfile.ZIP_DEFLATED
@@ -41,9 +41,12 @@ def get_file_type_list(request):
     except:
         query=""
 
-    typeObjFather = Fi_file_type.objects.all().order_by('id').filter(name__contains=query)
+    typeObjFather = Fi_file_type.objects.filter(name__contains=query, isActive=1).order_by('id')
     if typeObjFather.exists():
-        filesParent = Fi_file.objects.all().order_by('fileType_id')
+        listIds = []
+        for data in typeObjFather:
+            listIds.append(data.pk)
+        filesParent = Fi_file.objects.filter(fileType_id__in=listIds).order_by('fileType_id')
     context = {
         'typeObjFather':typeObjFather,
          'filesParent': filesParent
@@ -66,7 +69,7 @@ def file_create_new(request):
     else:
         form = Fi_fileForm()
     try:
-        objGroupSelect = Fi_file_type.objects.filter(isActive=1)
+        objGroupSelect = Fi_file_type.objects.all().order_by("pk")
     except:
         objGroupSelect = None
     context = {
@@ -87,12 +90,13 @@ def file_group_create_new(request):
         if form.is_valid():
             form.save()
             messages.success(request, f"Se ha guardado correctamente el grupo")
-            return redirect('/add-file-page')
+            return redirect(file_create_new)
         else:
             print(form.errors)
             # messages.error(request, form.errors.get('message'))
-    return redirect('/add-file-page')
+    return redirect(file_create_new)
 
+@login_required
 def deleteFileById(request, id):
     if request.method == "GET":
         try:
@@ -104,14 +108,31 @@ def deleteFileById(request, id):
             messages.success(request, "Se ha eliminado con éxito")
         else:
             messages.error(request, "Se ha producido un error, no se ha podido eliminar el archivo")
-    return redirect("/list")
+    return redirect(get_file_type_list)
 
+def deleteGroupById(request, id):
+    if request.method == "GET":
+        try:
+            obj = Fi_file_type.objects.get(pk=id)
+        except Fi_file_type.DoesNotExist:
+            obj = None
+        if obj:
+            try:
+                obj.delete()
+                messages.success(request, "Se ha eliminado con éxito")
+            except RestrictedError:
+                messages.warning(request, "No es posible eliminar el grupo si tiene asociado archivos, elimine los archivos antes de volver a eliminar este grupo")
+        else:
+            messages.error(request, "Se ha producido un error, no se ha podido eliminar el archivo")
+    return redirect(file_group_create_new)
+
+
+@login_required
 def generateZipAjax(request):
     if request.method == "POST":
         if request.POST.get('id'):
             qrId = int(request.POST.get('id'))
             fileObj = Fi_file.objects.filter(fileType=qrId).exclude(files=None)
-        
             if fileObj.exists():
                 zipname = request.POST.get('name')
                 s = io.BytesIO()
@@ -142,6 +163,7 @@ def generateZipAjax(request):
 
     return HttpResponse("error", content_type="text/plain")
 
+@login_required
 def getAndUpdateFileObject(request):
     fileObj = None
     if request.method == "GET" and request.GET.get('id')!= None:
@@ -158,7 +180,6 @@ def getAndUpdateFileObject(request):
 
     elif request.method == "POST":
         id = request.POST.get('id')
-        print(request.FILES, " fumo?")
         fileObj = get_object_or_404(Fi_file, pk=id)
         if 'files' in request.FILES:
             form = Fi_fileFormEditWithFile(request.POST, request.FILES, instance=fileObj)
@@ -169,4 +190,17 @@ def getAndUpdateFileObject(request):
             messages.success(request, f"Se ha actualizado correctamente el documento")
         else:
             messages.error(request, form.errors)
-    return redirect("/list")
+    return redirect(get_file_type_list)
+
+def file_group_edit(request):
+
+    if request.method == "POST":
+        id = request.POST.get('id')
+        obj = get_object_or_404(Fi_file_type, pk=id)
+        form = Fi_file_typeForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Se ha actualizado el grupo con éxito")
+        else:
+            messages.warning(request, form.errors)
+    return redirect(file_create_new)
