@@ -29,9 +29,10 @@ DEBUG = str(os.getenv('DEBUG')) == "1"
 
 ALLOWED_HOSTS = []
 
-if not DEBUG :
+if DEBUG:
+    ALLOWED_HOSTS += [os.getenv('NGROK_HOST'),'localhost']
+else:
     ALLOWED_HOSTS += [os.getenv('ALLOWED_HOST')]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'files',
     'users',
+    'bot',
 ]
 #CREADOTEO
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

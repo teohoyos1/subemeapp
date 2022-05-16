@@ -13,16 +13,14 @@
         </div>
     </div>
     <div class="row">
-        {% if request.user.is_superuser %}
-            <div class="col-12 col-md-12 mt-3">
-                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalGroup1" onclick="openInHomeTab()">
-                    <i class="bi bi-pencil-square"></i>
-                    Grupos
-                </button>
-            </div>
-        {% endif %}
+        <div class="col-12 col-md-12 mt-3">
+            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalGroup1" onclick="openInHomeTab()">
+                <i class="bi bi-pencil-square"></i>
+                Grupos
+            </button>
+        </div>
     </div>
-    <form method="POST"  id="fileForm" enctype="multipart/form-data" novalidate>
+    <form method="POST" action="{% url 'listGroup' %}" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         <div class="row">
             <div class="col-6 col-md-12 mt-3 w-50 m-auto">

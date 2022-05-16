@@ -4,13 +4,19 @@
 
 {% block titulo %} Subeme-logIn {% endblock %}
 
+{% block head %}
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+{% endblock %}
+
 {% block style %}
     <style>
         .login-style{
             width: 800px;
             margin: auto;
-
         }
+        .iti {
+			width: 100%;
+		}
     </style>
 
 {% endblock %}
@@ -20,7 +26,7 @@
 <div class="container py-5 login-style">
     <h1>Perfil</h1>
 
-    <form method="POST" action="/profile/edit/" id="idProfileForm" novalidate>
+    <form method="POST" action="{% url 'profile_add' %}" id="idProfileForm" novalidate>
         {% csrf_token %}
         <div class="mb-3">
             <label for="usernameinput" class="form-label">Nombre de usuario:</label>
@@ -28,6 +34,7 @@
             <div id="usernameHelp" class="form-text">Este usuario no se puede cambiar una vez creado</div>
         </div>
         {{form |crispy}}
+        {{form_person |crispy}}
         <button type="submit" class="btn btn-sm btn-primary">Guardar</button>
     </form>
 </div>
@@ -35,17 +42,30 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script type="text/javascript">
+        const phoneInputField = document.querySelector("#phone");
+        const phoneInput = window.intlTelInput(phoneInputField, {
+        preferredCountries: ["co", "us", "es", "mx"],
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
+    </script>
     <script type="text/javascript">
         jQuery(document).ready(function(){
             nameInputDefault = jQuery("#id_first_name").val();
             lastNameInputDefault = jQuery("#id_last_name").val();
             emailInputDefault = jQuery("#id_email").val();
-
+            phoneNumber = jQuery("#phone").val();
+            address = jQuery("#id_address").val();
+            
             jQuery("#idProfileForm").submit(function(event){
-                if (jQuery("#id_first_name").val() === nameInputDefault && jQuery("#id_last_name").val() === lastNameInputDefault && jQuery("#id_email").val() === emailInputDefault){
+                if (jQuery("#id_first_name").val() === nameInputDefault && jQuery("#id_last_name").val() === lastNameInputDefault && jQuery("#id_email").val() === emailInputDefault && phoneInput.getNumber() === phoneNumber && jQuery("#id_address").val() === address){
                     alert("No guardaste nada");
                     event.preventDefault();
+                    return;
                 }
+                jQuery("#phone").val(phoneInput.getNumber());
             });
 
         });

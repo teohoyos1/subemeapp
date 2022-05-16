@@ -20,6 +20,7 @@
         <script src="https://kit.fontawesome.com/c6cae3133a.js" crossorigin="anonymous"></script>
         <!-- Core theme CSS (includes Bootstrap)-->
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        {% block head %} {% endblock %}
         <style>
             *{
                 font-family: 'Roboto', sans-serif;
@@ -55,6 +56,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'listGroup' %}">Agregar Documentos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'listBot' %}">Administrador Bot</a>
+                        </li>
                         {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'about' %}">InfoApp</a>
@@ -67,7 +71,7 @@
                                <b>{{user.username}}</b>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/profile/">Perfil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile_add' %}">Perfil</a></li>
                               <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
                             </ul>
                         </li>

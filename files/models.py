@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here CREADOTEO
 class Fi_file_type(models.Model):
+    user = models.ForeignKey(User, on_delete=models.RESTRICT)
     name = models.CharField(max_length=250) #foruser
     isActive = models.IntegerField(default=0) #interno
 

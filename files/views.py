@@ -41,7 +41,7 @@ def get_file_type_list(request):
     except:
         query=""
 
-    typeObjFather = Fi_file_type.objects.filter(name__contains=query, isActive=1).order_by('id')
+    typeObjFather = Fi_file_type.objects.filter(name__contains=query, isActive=1, user=request.user).order_by('id')
     if typeObjFather.exists():
         listIds = []
         for data in typeObjFather:
@@ -61,15 +61,15 @@ def about(request):
 def file_create_new(request):
     context = {}
     if request.method == 'POST':
-        form = Fi_fileForm(request.POST, request.FILES)
+        form = Fi_fileForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Archivo creado con éxito')
             return redirect(file_create_new)
     else:
-        form = Fi_fileForm()
+        form = Fi_fileForm(user=request.user)
     try:
-        objGroupSelect = Fi_file_type.objects.all().order_by("pk")
+        objGroupSelect = Fi_file_type.objects.filter(user=request.user).order_by("pk")
     except:
         objGroupSelect = None
     context = {
@@ -84,11 +84,11 @@ def file_group_create_new(request):
     context = {}
     if request.method == "POST":
         form = Fi_file_typeForm(request.POST)
-        print(form)
         context['form'] = form
-
         if form.is_valid():
-            form.save()
+            obj = form.save(commit=False)
+            obj.user = request.user
+            obj.save()
             messages.success(request, f"Se ha guardado correctamente el grupo")
             return redirect(file_create_new)
         else:
@@ -132,7 +132,7 @@ def generateZipAjax(request):
     if request.method == "POST":
         if request.POST.get('id'):
             qrId = int(request.POST.get('id'))
-            fileObj = Fi_file.objects.filter(fileType=qrId).exclude(files=None)
+            fileObj = Fi_file.objects.filter(fileType=qrId, user=request.user).exclude(files=None)
             if fileObj.exists():
                 zipname = request.POST.get('name')
                 s = io.BytesIO()

@@ -1,11 +1,13 @@
+from ast import Not
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout, models #CREADOTEO
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ObjectDoesNotExist
 
-from users.forms import CustomNewUserForm, ProfileForm
+from users.forms import CustomNewUserForm, ProfileForm, PersonForm
 # Create your views here.
 
 def signupUser(request):
@@ -14,15 +16,21 @@ def signupUser(request):
     context = {}
     if request.method == "POST":
         form = CustomNewUserForm(request.POST)
-        if form.is_valid():
+        form_person = PersonForm(request.POST)
+        if form.is_valid() and form_person.is_valid():
             user = form.save()
+            form_person = form_person.save(commit=False)
+            form_person.user = user
+            form_person.save()
             login(request, user)
             messages.success(request, f"Te has registrado correctamente {user.username}")
             return redirect("/")
     else:
         form = CustomNewUserForm()
+        form_person = PersonForm()
     context={
-        'form': form
+        'form': form,
+        'form_person':form_person
     }
     return render(request, "registration/signup.html", context)
 
@@ -55,39 +63,32 @@ def logout_request(request):
     messages.success(request, f"Has cerrado sesión con éxito")
     return render(request, 'home.html')
 
-@login_required
-def profile_page(request):
-    context={}
-    if request.method == "GET":
-        form = ProfileForm(instance=request.user)
-        context={
-            'form':form,
-            'username': request.user.username
-        }
-        # userid = 0
-        # if request.user is not None and isinstance(request.user.pk, int):
-        #     userid = request.user.pk
-        #     user = get_object_or_404(models.User, pk=userid)
-        #     context={
-        #         'userObj':user
-        #     }
-        # else:
-            # redirect("/")
-    return render(request, "profile/profile.html", context)
-
-
 def profile_edit(request):
     context={}
     if request.method == "POST":
         form = ProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
+        try:
+            form_person = PersonForm(request.POST, instance=request.user.person)
+        except ObjectDoesNotExist:
+            form_person = PersonForm(request.POST)
+
+        if form.is_valid() and form_person.is_valid():
+            user = form.save()
+            form_person = form_person.save(commit=False)
+            form_person.user = user
+            form_person.save()
             messages.success(request, "Información actualizada correctamente")
+            return redirect(profile_edit)
     else:
         form = ProfileForm(instance=request.user)
+        try:
+            form_person = PersonForm(instance=request.user.person)
+        except ObjectDoesNotExist:
+            form_person = PersonForm()
     context={
         'form': form,
-        'username': request.user.username,
+        'form_person': form_person,
+        'username': request.user.username
     }
     return render(request, "profile/profile.html", context)
 

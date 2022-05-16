@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block titulo %} Listado Bot {% endblock %}
+
+{% block head %}{% endblock %}
+
+{% block style %}{% endblock %}
+
+
+{% block content %}
+
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-6 col-md-4">
+                <h1>Mensajes Bot</h1>
+            </div>
+            <div class="col-12 col-md-12">
+                <div class="d-flex justify-content-end">
+                    <form class="d-flex" action="{% url 'listFile' %}" method="GET">
+                        <div class="input-group">
+                            <input type="text" class="form-control " name="qr" placeholder="Buscar...">
+                            <div class="input-group-append">
+                                <span class="input-group-btn">
+                                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass fa-sm"></i></button>
+                                </span>
+                            </div>
+                        </div><!-- /input-group -->
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            {%for data in objBot %}
+                <div class="col-6 accordion mt-2" id="accordionFather{{data.id}}">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFather{{data.id}}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDad{{data.id}}" aria-expanded="true" aria-controls="collapseDad{{data.id}}">
+                            {{data.typeMessage}}
+                        </button>
+                        </h2>
+                        <div id="collapseDad{{data.id}}" class="accordion-collapse collapse" aria-labelledby="headingFather{{data.id}}" data-bs-parent="#accordionFather{{data.id}}">
+                            <div class="accordion-body row"> <!--Dad start body-->
+                                <div class="col-12 mt-2">
+                                    <label for="text-tracking">Texto:</label>
+                                    <textarea class="form-control" name="message" id="text-tracking" rows="3">{{data.message}}</textarea>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <label for="resumeId{{data.pk}}" class="form-label">Abreviatura:</label>
+                                    <input class="form-control form-control-sm" type="text" id="resumeId{{data.pk}}" name="resume" placeholder="Abreviatura" value="{{data.resume}}">
+                                </div>
+                                <div class="col-6 text-center mt-2">
+                                    <label class="form-check-label" for="flexSwitchCheckChecked">Activar:</label>
+                                    <div class="form-check form-switch mt-3 d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="activateGroup" value="{{data.status}}">
+                                        <input type="hidden" name="isActive" id="isActiveHidden">
+                                    </div>
+                                </div>
+
+                            </div> <!--Dad end body-->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+
+        jQuery(document).ready(function(){
+
+        });
+    </script>
+
+{% endblock %}

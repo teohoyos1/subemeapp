@@ -14,7 +14,10 @@ class Fi_file_typeForm(forms.ModelForm):
 
 class Fi_fileForm(forms.ModelForm):
 
-    fileType = forms.ModelChoiceField(queryset=Fi_file_type.objects.filter(isActive=1),empty_label="Seleccione...", label="Grupo:")
+    def __init__(self, *args, **kwargs):
+        userReq = kwargs.pop('user')
+        super(Fi_fileForm, self).__init__(*args, **kwargs)
+        self.fields['fileType'] = forms.ModelChoiceField(queryset=Fi_file_type.objects.filter(isActive=1, user=userReq),empty_label="Seleccione...", label="Grupo:")
 
     class Meta:
         model = Fi_file
