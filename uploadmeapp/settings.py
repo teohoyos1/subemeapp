@@ -182,3 +182,5 @@ else:
 CORS_ORIGIN_WHITELIST = [
      'http://localhost:3000'
 ]
+
+CSRF_TRUSTED_ORIGINS = [os.getenv('NGROK_CSRF'),'https://*.127.0.0.1']
