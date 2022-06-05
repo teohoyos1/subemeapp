@@ -25,7 +25,7 @@
         {{ login_form|crispy }}
         <button class="mt-2 btn btn-primary" type="submit"><i class="bi bi-box-arrow-in-right"> </i>Iniciar</button>
     </form>
-    <p class="text-center">Aún no tienes cuenta? <a href="/signup">Crear cuenta</a>.</p>
+    <p class="text-center">Aún no tienes cuenta? <a href="/signup">Crear cuenta</a>. Olvidaste tu <a href="{% url 'password_reset' %}">contraseña?</a></p>
 
 </div>
 

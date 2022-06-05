@@ -20,7 +20,7 @@ client = Client(account_sid, auth_token)
 
 @csrf_exempt
 def bot(request):
-    print(request.POST)
+    #print(request.POST)
     messagesBody = request.POST.get('Body')
     profileName = request.POST.get('ProfileName')
     phoneReceiver = request.POST.get('From')
@@ -41,26 +41,19 @@ def bot(request):
         #valida si el tracking path tiene submenu
         match qsTracking.trackingPath:
             case '0':
-                try:
-                    obj = bo_bot_message.objects.get(resume='1')
-                    responseMessage = obj.message.format(profileName,'Mis documentos','Mis Carpetas','Sitio web')
-                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
-                    create_or_update_tracker(phoneReceiverCleaned,'1',messagesBody,AccountSidd,True)
-                    response = HttpResponse("Cookie Set")
-                    response.set_cookie('sessionUserid', qsTracking.user.id)
-                    return response
-                except bo_bot_message.DoesNotExist:
-                    responseMessage = 'Inténtalo de nuevo más tarde'
-                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+
+                goHomeMenu(profileName,phoneSandbox,phoneReceiver,phoneReceiverCleaned,messagesBody,AccountSidd)
+                response = HttpResponse("response data")
+                response.delete_cookie('sessionfiletypeid')
+                return response
             case '1':
-                print("Caso 1 cuando pasa del 0")
+
                 match messagesBody:
                     case '1': #Mis documentos
-                        print(messagesBody,' caso 1 cuando pasa a 1.1')
+
                         try:
                             #idUser = request.COOKIES['sessionUserid']
                             idUser = qsTracking.user.id
-                            print(idUser)
                             if idUser:
                                 userObj = User.objects.get(pk=idUser)
                             else:
@@ -73,11 +66,18 @@ def bot(request):
                         if userObj:
                             responseMessage = ''
                             objFileType = Fi_file_type.objects.filter(isActive=1, user=userObj).order_by('id')
-                            for i,item in enumerate(objFileType, start=1):
-                                responseMessage += f"*{i}.* {item.name} \n"
-                            createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
-                            create_or_update_tracker(phoneReceiverCleaned,'1.1',messagesBody,AccountSidd,True)
-                            return HttpResponse('success')
+                            if objFileType:
+                                responseMessage = 'Seleciona el archivo a descargar 😄\n'
+                                for i,item in enumerate(objFileType, start=1):
+                                    responseMessage += f"*{i}.* {item.name} \n"
+                                createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                                create_or_update_tracker(phoneReceiverCleaned,'1.1',messagesBody,AccountSidd,True)
+                                return HttpResponse('success')
+                            else:
+                                responseMessage = 'No tienes documentos creados aún 🤔 \n Crealos en la pagina web'
+                                createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                                create_or_update_tracker(phoneReceiverCleaned,'0',messagesBody,AccountSidd,True)
+                                return HttpResponse('send session error')
                         else:
                             responseMessage = 'Inténtalo de nuevo más tarde, algo salió mal'
                             createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
@@ -85,7 +85,14 @@ def bot(request):
                     case '2': #Mis Carpetas
                         pass
                     case '3': #Sitio web
-                        pass
+                        try:
+                            obj = bo_bot_message.objects.get(resume='3')
+                            responseMessage = obj.message.format(request.build_absolute_uri('/')[:-1],'Volver atrás')
+                        except bo_bot_message.DoesNotExist as e:
+                            obj = None
+                            responseMessage = 'Inténtalo de nuevo más tarde'
+                        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                        create_or_update_tracker(phoneReceiverCleaned,'0',messagesBody,AccountSidd,True)
                     case _:
                         try:
                             obj = bo_bot_message.objects.get(resume='1')
@@ -97,7 +104,137 @@ def bot(request):
                         create_or_update_tracker(phoneReceiverCleaned,'1',messagesBody,AccountSidd,True)
 
             case '1.1':
-                print('fumadon caleño1.1')
+
+                if messagesBody.isdigit() and int(messagesBody) > 0:
+                    try:
+                        idUser = qsTracking.user.id
+                        if idUser:
+                            userObj = User.objects.get(pk=idUser)
+                        else:
+                            userObj = None
+                    except Person.DoesNotExist as ex:
+                        userObj = None
+                        responseMessage = 'El usuario no existe, crea una cuenta desde la pagina web'
+                        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                        return HttpResponse('send error no existe')
+                    if userObj:
+                        objFileType = Fi_file_type.objects.filter(isActive=1, user=userObj).order_by('id')
+                        try:
+                            objFileTypeSelected = objFileType[int(messagesBody)-1]
+                        except IndexError:
+                            objFileTypeSelected = None
+                        if objFileTypeSelected:
+                            try:
+                                
+                                objFile = Fi_file.objects.filter(fileType_id=objFileTypeSelected.id).order_by('id')
+                                if objFile.exists():
+                                    responseMessage = 'Escriba el numero relacionado para continuar 😄\n'
+                                    for i,item in enumerate(objFile, start=1):
+                                        responseMessage += f"*{i}.* {item.fileTypeName} \n"
+                                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                                    create_or_update_tracker(phoneReceiverCleaned,'1.1.1',messagesBody,AccountSidd,True)
+                                    response = HttpResponse("Cookie Set")
+                                    response.set_cookie('sessionfiletypeid', objFileTypeSelected.id)
+                                    return response
+                                else:
+                                    #nohaymessage
+                                    responseMessage = 'No hay archivos en esta carpeta 🤔\n Selecciona la opción existente o regresa al menú *0*'
+                                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                                    return HttpResponse('send error no existe')
+                            except:
+                                objFileTypeSelected = None
+                                print(f'No hay objeto en la posición {int(messagesBody)-1}')
+                        else:
+                            print('No hay objeto')
+                            responseMessage = 'No existe la carpeta seleccionada 🤔\n Selecciona la opción existente o regresa al menú *0*'
+                            createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                            return HttpResponse('send error no existe')
+
+                    else:
+                        responseMessage = 'Inténtalo de nuevo más tarde, algo salió mal'
+                        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                        return HttpResponse('send session error')
+                
+                elif messagesBody == '0':
+                    #nohaymessage
+                    goHomeMenu(profileName,phoneSandbox,phoneReceiver,phoneReceiverCleaned,messagesBody,AccountSidd)
+                    response = HttpResponse("response data")
+                    response.delete_cookie('sessionfiletypeid')
+                    return response
+                
+                else:
+                    #nohaymessage
+                    responseMessage = 'Opción incorrecta 🤔\n Ingresa un numero valido'
+                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                    create_or_update_tracker(phoneReceiverCleaned,'1.1',messagesBody,AccountSidd,True)
+                    return HttpResponse('send error incorrecto')
+                    
+            case '1.1.1':
+
+                if messagesBody.isdigit() and int(messagesBody) > 0:
+                    try:
+                        idUser = qsTracking.user.id
+                        if idUser:
+                            userObj = User.objects.get(pk=idUser)
+                        else:
+                            userObj = None
+                    except Person.DoesNotExist as ex:
+                        userObj = None
+                        responseMessage = 'El usuario no existe, crea una cuenta desde la pagina web'
+                        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                        return HttpResponse('send error no existe')
+
+                    try:
+                        objFileTypeId = request.COOKIES['sessionfiletypeid']
+                        objFile = Fi_file.objects.filter(fileType_id=objFileTypeId).order_by('id')
+                        if objFile.exists():
+                            try:
+                                objFileSelected = objFile[int(messagesBody)-1]
+                            except IndexError:
+                                objFileSelected = None
+                            
+                            if objFileSelected:
+                                fileUrl = ''
+                                if str(os.getenv('USE_S3_CLOUD')) == "1":
+                                    fileUrl = objFileSelected.files.url
+                                else:
+                                    print(objFileSelected.files.url+'-'+objFileSelected.files.name)
+                                    fileUrl = request.build_absolute_uri('/')[:-1] + objFileSelected.files.url
+                                responseMessage = f'Se ha generado el documento 📄\n ⬅ Volver al menú principal'
+                                createMessage(responseMessage,phoneSandbox,phoneReceiver,True,fileUrl)
+                                create_or_update_tracker(phoneReceiverCleaned,'0',messagesBody,AccountSidd,True)
+                                return HttpResponse('success')
+                            else:
+                                #Object doesn't exist (Index out)
+                                print('No hay objeto')
+                                responseMessage = 'No existe la carpeta seleccionada 🤔\n Selecciona la opción existente o regresa al menú *0*'
+                                createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                                return HttpResponse('send error no existe')
+                        else:
+                            #nohaymessage
+                            responseMessage = 'No hay archivos en esta carpeta 🤔\n Selecciona otra carpeta o regresa al menú enviando *0*'
+                            createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                            return HttpResponse('send error no existe')
+                    except:
+                        objFileTypeSelected = None
+                        print(f'No hay objeto en la posición 1.1.1 {int(messagesBody)-1}')
+                
+                elif messagesBody == '0':
+                    #nohaymessage
+                    goHomeMenu(profileName,phoneSandbox,phoneReceiver,phoneReceiverCleaned,messagesBody,AccountSidd)
+                    response = HttpResponse("response data")
+                    response.delete_cookie('sessionfiletypeid')
+                    return response
+                else:
+                    #nohaymessage
+                    responseMessage = 'Opción incorrecta 🤔\n Ingresa un numero valido'
+                    createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+                    create_or_update_tracker(phoneReceiverCleaned,'1.1',messagesBody,AccountSidd,True)
+                    return HttpResponse('send error incorrecto')
+
+                    
+
+
             case '1.2':
                 print('fumadon caleño1.2')
             case '1.3':
@@ -191,3 +328,12 @@ def listBot(request):
     return render(request, 'bot/list.html', context)
 
 
+def goHomeMenu(profileName,phoneSandbox,phoneReceiver,phoneReceiverCleaned,messagesBody,AccountSidd):
+    try:
+        obj = bo_bot_message.objects.get(resume='1')
+        responseMessage = obj.message.format(profileName,'Mis documentos','Mis Carpetas','Sitio web')
+        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)
+        create_or_update_tracker(phoneReceiverCleaned,'1',messagesBody,AccountSidd,True)
+    except bo_bot_message.DoesNotExist:
+        responseMessage = 'Inténtalo de nuevo más tarde'
+        createMessage(responseMessage,phoneSandbox,phoneReceiver,False)

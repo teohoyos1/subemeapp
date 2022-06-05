@@ -36,6 +36,9 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
+    'files',
+    'users',
+    'bot',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,9 +53,6 @@ INSTALLED_APPS = [
     'storages',
     'corsheaders',
     'rest_framework',
-    'files',
-    'users',
-    'bot',
 ]
 #CREADOTEO
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -184,3 +184,12 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [os.getenv('NGROK_CSRF'),'https://*.127.0.0.1']
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USERS')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_CREDENTIALS')
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_mail")
