@@ -183,7 +183,7 @@ CORS_ORIGIN_WHITELIST = [
      'http://localhost:3000'
 ]
 
-CSRF_TRUSTED_ORIGINS = [os.getenv('NGROK_CSRF'),'https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_HOST'),'https://*.127.0.0.1']
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
