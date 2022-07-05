@@ -187,12 +187,13 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-#CREADOTEO - Corsheaders
-CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
-]
 
-CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_HOST'),'https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = []
+
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1']
+else:
+    CSRF_TRUSTED_ORIGINS = [os.getenv('ALLOWED_HOST')]
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
