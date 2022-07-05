@@ -139,7 +139,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-#STATIC_URL = os.getenv('PROJECT_STATIC_URL')
+# Add these new lines
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -169,13 +172,18 @@ if str(os.getenv('USE_S3_CLOUD'))=="1":
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME_ENV')
     AWS_QUERYSTRING_AUTH = False
     AWS_DEFAULT_ACL = None
-    MEDIA_URL = os.getenv('AWS_MEDIA_URL')
+    AWS_S3_OBJECT_PARAMETERS={'CacheControl':'max-age=86400'}
     AWS_S3_FILE_OVERWRITE = False
+    AWS_LOCATION = 'static/'
+
+    STATIC_URL = os.getenv('AWS_MEDIA_URL') + AWS_LOCATION
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
     MEDIA_ROOT = 'media/'
+    MEDIA_URL = os.getenv('AWS_MEDIA_URL') + MEDIA_ROOT
+    
 else:
     
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
