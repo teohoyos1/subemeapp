@@ -193,7 +193,7 @@ CSRF_TRUSTED_ORIGINS = []
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1']
 else:
-    CSRF_TRUSTED_ORIGINS = [os.getenv('ALLOWED_HOST')]
+    CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_HOST')]
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
