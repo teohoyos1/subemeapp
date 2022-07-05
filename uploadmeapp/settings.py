@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 if DEBUG:
     ALLOWED_HOSTS += [os.getenv('NGROK_HOST'),'localhost']
 else:
-    ALLOWED_HOSTS += ['localhost']
+    ALLOWED_HOSTS += [os.getenv('ALLOWED_HOST')]
 # Application definition
 
 INSTALLED_APPS = [
