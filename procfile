@@ -1,1 +1,1 @@
-web: gunicorn uploadmeapp.wsgi
+web: gunicorn uploadmeapp.wsgi --log-file -
