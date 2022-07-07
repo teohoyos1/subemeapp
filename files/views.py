@@ -1,5 +1,5 @@
-from multiprocessing import context
 import os
+import logging
 from django.db.models import RestrictedError
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -8,6 +8,8 @@ from django.contrib import messages
 import zipfile
 import io
 from urllib.request import urlopen
+
+
 try:
     import zlib
     compression = zipfile.ZIP_DEFLATED
@@ -134,6 +136,7 @@ def generateZipAjax(request):
             qrId = int(request.POST.get('id'))
             fileObj = Fi_file.objects.filter(fileType=qrId, user=request.user).exclude(files=None)
             if fileObj.exists():
+                logging.info("File exist ", exc_info=True)
                 zipname = request.POST.get('name')
                 s = io.BytesIO()
                 zf = zipfile.ZipFile(s, "w")
@@ -153,6 +156,9 @@ def generateZipAjax(request):
                                 fname = os.path.split(fileUrl)[1]
                                 zf.write("."+file.files.url,fname)
                                 print('.'+file.files.url)
+                except Exception as ex:
+                    logging.critical("Se generó una exepción: ", exc_info=True)
+
                 finally:
                     zf.close()
 
